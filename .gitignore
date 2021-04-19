@@ -1,4 +1,4 @@
 *.pkl
 *.pyc
 keys.py
-/quick-python-projects/.env
+quick-python-projects/*.env

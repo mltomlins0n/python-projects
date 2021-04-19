@@ -1,4 +1,4 @@
 *.pkl
 *.pyc
 keys.py
-env
+.env

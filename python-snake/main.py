@@ -174,8 +174,7 @@ class Apple:
     def __init__(self, parent_screen):
         self.image = pygame.image.load('assets/apple.png').convert_alpha()
         self.parent_screen = parent_screen
-        self.x = random.randint(0,29) * BLOCKSIZE
-        self.y = random.randint(0,19) * BLOCKSIZE
+        self.move()
 
     def draw(self):
         self.parent_screen.blit(self.image, (self.x, self.y))

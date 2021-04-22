@@ -133,7 +133,7 @@ class Game:
                 paused = True
                 self.reset()
             time.sleep(0.1) # Game speed
-
+# TODO: Add third diff coloured block to snake
 class Snake:
     def __init__(self, parent_screen, length):
         self.length = length
@@ -202,6 +202,8 @@ class Apple:
     def move(self):
         self.x = random.randint(0, X_MAX) * BLOCKSIZE
         self.y = random.randint(0, Y_MAX) * BLOCKSIZE
+
+# TODO: Create decoy apple object that hurts the snake in some way
 
 if __name__ == '__main__':
     game = Game()

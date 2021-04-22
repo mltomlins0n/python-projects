@@ -6,6 +6,8 @@ from pygame.locals import *
 BLOCKSIZE = 40
 BACKGROUND_COLOR = (135,86,0)
 TEXT_COLOR = (255,255,255)
+WINDOW_X = 1200
+WINDOW_Y = 800
 
 class Game:
     def __init__(self):
@@ -14,7 +16,7 @@ class Game:
         pygame.mixer.init() # Initialize sounds
         self.play_bgm('bgm.mp3', 0.1)
         # Draw the window
-        self.surface = pygame.display.set_mode(size=(1200, 800))
+        self.surface = pygame.display.set_mode(size=(WINDOW_X, WINDOW_Y))
         self.snake = Snake(self.surface, 3)
         self.snake.draw()
         self.apple = Apple(self.surface)
@@ -123,15 +125,19 @@ class Snake:
     def __init__(self, parent_screen, length):
         self.length = length
         self.parent_screen = parent_screen
-        self.image = pygame.image.load('assets/block.jpg').convert()
+        self.head = pygame.image.load('assets/block_head.jpg').convert()
+        self.body = pygame.image.load('assets/block.jpg').convert()
         # init an array of size 'length'
         self.x = [BLOCKSIZE] * length
         self.y = [BLOCKSIZE] * length
         self.direction = 'down'
-    
+
     def draw(self):
         for i in range(self.length):
-            self.parent_screen.blit(self.image, (self.x[i], self.y[i]))
+            if i % 2 == 0: # Adjust colour patterns by changing condition
+                self.parent_screen.blit(self.head, (self.x[i], self.y[i]))
+            else:
+                self.parent_screen.blit(self.body, (self.x[i], self.y[i]))
         pygame.display.flip()
     
     def increase_length(self):

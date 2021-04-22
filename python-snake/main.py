@@ -8,6 +8,10 @@ BACKGROUND_COLOR = (135,86,0)
 TEXT_COLOR = (255,255,255)
 WINDOW_X = 1200
 WINDOW_Y = 800
+# The max X and Y positions objects are allowed to spawn with, 
+# to avoid objects spawning offscreen
+X_MAX = (WINDOW_X/BLOCKSIZE)-1 
+Y_MAX = (WINDOW_Y/BLOCKSIZE)-1
 
 class Game:
     def __init__(self):
@@ -23,9 +27,13 @@ class Game:
         self.apple.draw()
 
     def is_collision(self, x1, y1, x2, y2):
-        if x1 >= x2 and x1 < x2 + BLOCKSIZE:
+        if x1 >= x2 and x1 < x2 + BLOCKSIZE: # x1 is on top of x2
             if y1 >= y2 and y1 < y2 + BLOCKSIZE:
                 return True
+
+    def is_offscreen(self, x1, y1, x2, y2,):
+        if x1 >= x2 or x1 < 0 or y1 >= y2 or y1 < 0: # snake is outside of window
+            return True
 
     def render_background(self):
         bg = pygame.image.load('assets/background.jpg')
@@ -69,6 +77,11 @@ class Game:
             if self.is_collision(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
                 self.play_sound('game-over-2.wav', 0.3)
                 raise 'Game Over'
+
+        # Snake collides with edge of window - game over
+        if self.is_offscreen(self.snake.x[0], self.snake.y[0], WINDOW_X, WINDOW_Y):
+            self.play_sound('game-over-2.wav', 0.3)
+            raise 'Game Over'
     
     def show_game_over(self):
         self.render_background()
@@ -187,9 +200,8 @@ class Apple:
         pygame.display.flip()
     
     def move(self):
-        self.x = random.randint(0,29) * BLOCKSIZE
-        self.y = random.randint(0,19) * BLOCKSIZE
-
+        self.x = random.randint(0, X_MAX) * BLOCKSIZE
+        self.y = random.randint(0, Y_MAX) * BLOCKSIZE
 
 if __name__ == '__main__':
     game = Game()

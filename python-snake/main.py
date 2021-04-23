@@ -151,6 +151,7 @@ class Snake:
         self.parent_screen = parent_screen
         self.head = pygame.image.load('assets/block_head.jpg').convert()
         self.body = pygame.image.load('assets/block.jpg').convert()
+        self.stripe = pygame.image.load('assets/block2.jpg').convert()
         # init an array of size 'length'
         self.x = [BLOCKSIZE] * length
         self.y = [BLOCKSIZE] * length
@@ -158,8 +159,10 @@ class Snake:
 
     def draw(self):
         for i in range(self.length):
-            if i % 2 == 0: # Adjust colour patterns by changing condition
+            if i == 0: # Snake's head
                 self.parent_screen.blit(self.head, (self.x[i], self.y[i]))
+            elif i % 2 == 0: # Adjust colour patterns by changing condition
+                self.parent_screen.blit(self.stripe, (self.x[i], self.y[i]))
             else:
                 self.parent_screen.blit(self.body, (self.x[i], self.y[i]))
         pygame.display.flip()

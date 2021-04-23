@@ -25,6 +25,10 @@ class Game:
         self.snake.draw()
         self.apple = Apple(self.surface)
         self.apple.draw()
+        self.orange_portal = Portal(self.surface)
+        self.blue_portal = Portal(self.surface)
+        self.orange_portal.draw('orange')
+        self.blue_portal.draw('blue')
 
     def is_collision(self, x1, y1, x2, y2):
         if x1 >= x2 and x1 < x2 + BLOCKSIZE: # x1 is on top of x2
@@ -60,6 +64,8 @@ class Game:
         self.render_background()
         self.snake.move()
         self.apple.draw()
+        self.orange_portal.draw('orange')
+        self.blue_portal.draw('blue')
         self.display_score()
         pygame.display.flip()
 
@@ -68,9 +74,19 @@ class Game:
             self.play_sound('chomp.wav', 0.2)
             self.snake.increase_length()
             self.apple.move()
-            # debug
-            #print('Apple x: ', self.apple.x)
-            #print('Apple y: ', self.apple.y)
+
+        # Snake enters orange portal - warps to blue
+        if self.is_collision(self.snake.x[0], self.snake.y[0], self.orange_portal.x, self.orange_portal.y):
+            self.snake.x[0] = self.blue_portal.x
+            self.snake.y[0] = self.blue_portal.y
+            #self.orange_portal.move()
+            #self.blue_portal.move()
+        # Snake enters blue portal - warps to orange
+        elif self.is_collision(self.snake.x[0], self.snake.y[0], self.blue_portal.x, self.blue_portal.y):
+            self.snake.x[0] = self.orange_portal.x
+            self.snake.y[0] = self.orange_portal.y
+            #self.orange_portal.move()
+            #self.blue_portal.move()
 
         # Snake collising with itself - game over
         for i in range(1, self.snake.length):
@@ -106,6 +122,8 @@ class Game:
     def reset(self):
         self.snake = Snake(self.surface, 3)
         self.apple = Apple(self.surface)
+        self.orange_portal = Portal(self.surface)
+        self.blue_portal = Portal(self.surface)
 
     def run(self):
         # Game loop
@@ -122,14 +140,14 @@ class Game:
                             self.play_bgm('bgm.mp3', 0.1)
                         paused = False
 
-                    if not paused:
-                        if event.key == K_w:
+                    if not paused: # direction check prevents snake turning 180 degrees and colliding
+                        if event.key == K_w and self.snake.direction != 'down':
                             self.snake.move_up()
-                        if event.key == K_s:
+                        if event.key == K_s and self.snake.direction != 'up':
                             self.snake.move_down()
-                        if event.key == K_a:
+                        if event.key == K_a and self.snake.direction != 'right':
                             self.snake.move_left()
-                        if event.key == K_d:
+                        if event.key == K_d and self.snake.direction != 'left':
                             self.snake.move_right()
 
                 elif event.type == QUIT:
@@ -144,7 +162,7 @@ class Game:
                 paused = True
                 self.reset()
             time.sleep(0.1) # Game speed
-# TODO: Add third diff coloured block to snake
+
 class Snake:
     def __init__(self, parent_screen, length):
         self.length = length
@@ -218,11 +236,30 @@ class Apple:
     def move(self): # Re randomise position
         self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
         self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
-        self.draw()
+        #self.draw()
 
 # TODO: Create decoy apple object that hurts the snake in some way
 
-# TODO: Portals
+# TODO: Add functionality to wait before moving portals
+class Portal:
+    def __init__(self, parent_screen):
+        self.orange_image = pygame.image.load('assets/orange_portal.jpg').convert()
+        self.blue_image = pygame.image.load('assets/blue_portal.jpg').convert()
+        self.parent_screen = parent_screen
+        self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
+        self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
+
+    def draw(self, color):
+        self.color = color
+        if color == 'orange':
+            self.parent_screen.blit(self.orange_image, (self.x, self.y))
+        elif color == 'blue':
+            self.parent_screen.blit(self.blue_image, (self.x, self.y))
+        pygame.display.flip()
+
+    def move(self): # Re randomise position
+        self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
+        self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
 
 if __name__ == '__main__':
     game = Game()

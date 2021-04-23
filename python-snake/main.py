@@ -10,8 +10,8 @@ WINDOW_X = 1200
 WINDOW_Y = 800
 # The max X and Y positions objects are allowed to spawn with, 
 # to avoid objects spawning offscreen
-X_MAX = (WINDOW_X/BLOCKSIZE)-1 
-Y_MAX = (WINDOW_Y/BLOCKSIZE)-1
+X_MAX = WINDOW_X - BLOCKSIZE
+Y_MAX = WINDOW_Y - BLOCKSIZE
 
 class Game:
     def __init__(self):
@@ -56,7 +56,7 @@ class Game:
         pygame.mixer.music.set_volume(volume)
         pygame.mixer.music.play(-1) # -1 loops for infinite looping
 
-    def play(self):
+    def play(self): # Runs every frame
         self.render_background()
         self.snake.move()
         self.apple.draw()
@@ -207,15 +207,18 @@ class Apple:
     def __init__(self, parent_screen):
         self.image = pygame.image.load('assets/apple.png').convert_alpha()
         self.parent_screen = parent_screen
-        self.move()
+        # Apples can't spawn on the edges of the screen and break collision
+        self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
+        self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
 
     def draw(self):
         self.parent_screen.blit(self.image, (self.x, self.y))
         pygame.display.flip()
     
-    def move(self):
-        self.x = random.randint(0, X_MAX) * BLOCKSIZE
-        self.y = random.randint(0, Y_MAX) * BLOCKSIZE
+    def move(self): # Re randomise position
+        self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
+        self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
+        self.draw()
 
 # TODO: Create decoy apple object that hurts the snake in some way
 

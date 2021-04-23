@@ -79,10 +79,21 @@ class Game:
                 raise 'Game Over'
 
         # Snake collides with edge of window - game over
+        #if self.is_offscreen(self.snake.x[0], self.snake.y[0], WINDOW_X, WINDOW_Y):
+        #    self.play_sound('game-over-2.wav', 0.3)
+        #    raise 'Game Over'
+
+        # Snake goes offscreen and wraps around pac man style
         if self.is_offscreen(self.snake.x[0], self.snake.y[0], WINDOW_X, WINDOW_Y):
-            self.play_sound('game-over-2.wav', 0.3)
-            raise 'Game Over'
-    
+            if self.snake.x[0] >= WINDOW_X: # offscreen to the right
+                self.snake.x[0] = 0
+            elif self.snake.x[0] <= 0: # offecreen to the left
+                self.snake.x[0] = WINDOW_X
+            elif self.snake.y[0] >= WINDOW_Y: # offscreen to the bottom
+                self.snake.y[0] = 0
+            elif self.snake.y[0] <= 0: # offscreen to the top
+                self.snake.y[0] = WINDOW_Y
+
     def show_game_over(self):
         self.render_background()
         font = pygame.font.SysFont('comic sans MS', 30)
@@ -204,6 +215,8 @@ class Apple:
         self.y = random.randint(0, Y_MAX) * BLOCKSIZE
 
 # TODO: Create decoy apple object that hurts the snake in some way
+
+# TODO: Portals
 
 if __name__ == '__main__':
     game = Game()

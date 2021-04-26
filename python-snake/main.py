@@ -88,6 +88,8 @@ class Game:
             self.bad_apple.move()
             self.play_sound('chomp.wav', 0.2)
             self.play_sound('hiss.wav', 1)
+            self.snake.draw_damage()
+            # Don't decrease length below 3
             if self.snake.length > 3:
                 self.snake.decrease_length()
                 self.update_score()
@@ -203,6 +205,11 @@ class Snake:
                 self.parent_screen.blit(self.stripe, (self.x[i], self.y[i]))
             else:
                 self.parent_screen.blit(self.body, (self.x[i], self.y[i]))
+        pygame.display.flip()
+
+    def draw_damage(self):
+        for i in range(self.length):
+            self.parent_screen.blit(self.head, (self.x[i], self.y[i]))
         pygame.display.flip()
     
     def increase_length(self):

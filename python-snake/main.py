@@ -23,12 +23,15 @@ class Game:
         self.surface = pygame.display.set_mode(size=(WINDOW_X, WINDOW_Y))
         self.snake = Snake(self.surface, 3)
         self.snake.draw()
-        self.apple = Apple(self.surface)
+        self.apple = Apple(self.surface, 'apple.png')
+        self.bad_apple = Apple(self.surface, 'bad_apple.png')
         self.apple.draw()
-        self.orange_portal = Portal(self.surface)
-        self.blue_portal = Portal(self.surface)
-        self.orange_portal.draw('orange')
-        self.blue_portal.draw('blue')
+        self.bad_apple.draw()
+        self.orange_portal = Portal(self.surface, 'orange_portal.jpg')
+        self.blue_portal = Portal(self.surface, 'blue_portal.jpg')
+        self.orange_portal.draw()
+        self.blue_portal.draw()
+        self.score = self.snake.length*10
 
     def is_collision(self, x1, y1, x2, y2):
         if x1 >= x2 and x1 < x2 + BLOCKSIZE: # x1 is on top of x2
@@ -45,8 +48,11 @@ class Game:
 
     def display_score(self):
         font = pygame.font.SysFont('comic sans MS', 30)
-        score = font.render(f'Score: {self.snake.length*10}', True, TEXT_COLOR)
-        self.surface.blit(score, (970,10))
+        self.score_display = font.render(f'Score: {self.score}', True, TEXT_COLOR)
+        self.surface.blit(self.score_display, (970,10))
+
+    def update_score(self):
+        self.score = self.snake.length*10
 
     # 'Sound' param requires filetype e.g. sfx.wav
     def play_sound(self, sound, volume):
@@ -64,17 +70,30 @@ class Game:
         self.render_background()
         self.snake.move()
         self.apple.draw()
-        self.orange_portal.draw('orange')
-        self.blue_portal.draw('blue')
+        self.bad_apple.draw()
+        self.orange_portal.draw()
+        self.blue_portal.draw()
         self.display_score()
         pygame.display.flip()
 
-        # Snake eating apple
+        # Snake eating apple and gains length
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
             self.play_sound('chomp.wav', 0.2)
             self.snake.increase_length()
+            self.update_score()
             self.apple.move()
 
+        # Snake eating bad apple and loses length
+        if self.is_collision(self.snake.x[0], self.snake.y[0], self.bad_apple.x, self.bad_apple.y):
+            if self.snake.length > 3:
+                self.snake.decrease_length()
+                self.play_sound('chomp.wav', 0.2)
+                self.bad_apple.move()
+                self.update_score()
+            else:
+                self.play_sound('chomp.wav', 0.2)
+                self.bad_apple.move()
+                
         # Snake enters orange portal - warps to blue
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.orange_portal.x, self.orange_portal.y):
             self.snake.x[0] = self.blue_portal.x
@@ -117,15 +136,16 @@ class Game:
         font = pygame.font.SysFont('comic sans MS', 30)
         line1 = font.render(f'Game Over! Your final score is {self.snake.length*10}', True, TEXT_COLOR)
         self.surface.blit(line1, (350, 300))
-        line2 = font.render(f'Hit Enter to go agane, or Esc to quit.', True, TEXT_COLOR)
+        line2 = font.render(f'Hit Enter to go again, or Esc to quit.', True, TEXT_COLOR)
         self.surface.blit(line2, (350, 350))
         pygame.display.flip()
 
     def reset(self):
         self.snake = Snake(self.surface, 3)
-        self.apple = Apple(self.surface)
-        self.orange_portal = Portal(self.surface)
-        self.blue_portal = Portal(self.surface)
+        self.apple = Apple(self.surface, 'apple.png')
+        self.bad_apple = Apple(self.surface, 'bad_apple.png')
+        self.orange_portal = Portal(self.surface, 'orange_portal.jpg')
+        self.blue_portal = Portal(self.surface, 'blue_portal.jpg')
 
     def run(self):
         # Game loop
@@ -188,9 +208,14 @@ class Snake:
         pygame.display.flip()
     
     def increase_length(self):
-        self.length +=1
-        self.x.append(-1)
-        self.y.append(-1)
+        self.length += 1
+        self.x.append(1)
+        self.y.append(1)
+    
+    def decrease_length(self):
+        self.length -= 1
+        self.x.pop()
+        self.y.pop()
 
     def move(self):
         for i in range(self.length -1, 0, -1):
@@ -224,8 +249,8 @@ class Snake:
         self.draw()
 
 class Apple:
-    def __init__(self, parent_screen):
-        self.image = pygame.image.load('assets/apple.png').convert_alpha()
+    def __init__(self, parent_screen, image):
+        self.image = pygame.image.load(f'assets/{image}').convert_alpha()
         self.parent_screen = parent_screen
         # Apples can't spawn on the edges of the screen and break collision
         self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
@@ -238,25 +263,19 @@ class Apple:
     def move(self): # Re randomise position
         self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
         self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
-        #self.draw()
 
 # TODO: Create decoy apple object that hurts the snake in some way
 
 # TODO: Add functionality to wait before moving portals
 class Portal:
-    def __init__(self, parent_screen):
-        self.orange_image = pygame.image.load('assets/orange_portal.jpg').convert()
-        self.blue_image = pygame.image.load('assets/blue_portal.jpg').convert()
+    def __init__(self, parent_screen, image):
+        self.image = pygame.image.load(f'assets/{image}').convert()
         self.parent_screen = parent_screen
         self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
         self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
 
-    def draw(self, color):
-        self.color = color
-        if color == 'orange':
-            self.parent_screen.blit(self.orange_image, (self.x, self.y))
-        elif color == 'blue':
-            self.parent_screen.blit(self.blue_image, (self.x, self.y))
+    def draw(self):
+        self.parent_screen.blit(self.image, (self.x, self.y))
         pygame.display.flip()
 
     def move(self): # Re randomise position

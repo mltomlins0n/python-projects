@@ -85,14 +85,12 @@ class Game:
 
         # Snake eating bad apple and loses length
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.bad_apple.x, self.bad_apple.y):
+            self.bad_apple.move()
+            self.play_sound('chomp.wav', 0.2)
+            self.play_sound('hiss.wav', 1)
             if self.snake.length > 3:
                 self.snake.decrease_length()
-                self.play_sound('chomp.wav', 0.2)
-                self.bad_apple.move()
                 self.update_score()
-            else:
-                self.play_sound('chomp.wav', 0.2)
-                self.bad_apple.move()
                 
         # Snake enters orange portal - warps to blue
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.orange_portal.x, self.orange_portal.y):

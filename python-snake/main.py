@@ -81,12 +81,14 @@ class Game:
             self.snake.y[0] = self.blue_portal.y
             #self.orange_portal.move()
             #self.blue_portal.move()
+            self.play_sound('portal.wav', 0.3)
         # Snake enters blue portal - warps to orange
         elif self.is_collision(self.snake.x[0], self.snake.y[0], self.blue_portal.x, self.blue_portal.y):
             self.snake.x[0] = self.orange_portal.x
             self.snake.y[0] = self.orange_portal.y
             #self.orange_portal.move()
             #self.blue_portal.move()
+            self.play_sound('portal.wav', 0.3)
 
         # Snake collising with itself - game over
         for i in range(1, self.snake.length):

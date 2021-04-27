@@ -1,4 +1,7 @@
 *.pkl
 *.pyc
+*.pyd
 keys.py
 *.env
+*.dll
+*.h

@@ -1,7 +1,7 @@
-*.pkl
-*.pyc
-*.pyd
-keys.py
+# global
+__pycache__
 *.env
-*.dll
-*.h
+*.zip
+# python-snake files
+python-snake/snek-game/
+python-snake/venv/

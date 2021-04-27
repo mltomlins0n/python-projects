@@ -18,6 +18,9 @@ class Game:
         pygame.init()
         pygame.display.set_caption('Python Snake Game')
         pygame.mixer.init() # Initialize sounds
+        self.clock = pygame.time.Clock()
+        self.start_ticks = pygame.time.get_ticks()
+        self.font = pygame.font.SysFont('comic sans MS', 30)
         self.play_bgm('bgm.mp3', 0.1)
         # Draw the window
         self.surface = pygame.display.set_mode(size=(WINDOW_X, WINDOW_Y))
@@ -47,8 +50,7 @@ class Game:
         self.surface.blit(bg, (0,0))
 
     def display_score(self):
-        font = pygame.font.SysFont('comic sans MS', 30)
-        self.score_display = font.render(f'Score: {self.score}', True, TEXT_COLOR)
+        self.score_display = self.font.render(f'Score: {self.score}', True, TEXT_COLOR)
         self.surface.blit(self.score_display, (970,10))
 
     def update_score(self):
@@ -74,6 +76,11 @@ class Game:
         self.orange_portal.draw()
         self.blue_portal.draw()
         self.display_score()
+
+        seconds = (pygame.time.get_ticks()-self.start_ticks) / 1000
+        txt = self.font.render(str(round(seconds, 1)), True, 'white')
+        self.surface.blit(txt, (20, 20))
+        self.clock.tick(60)
         pygame.display.flip()
 
         # Snake eating apple and gains length
@@ -98,15 +105,15 @@ class Game:
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.orange_portal.x, self.orange_portal.y):
             self.snake.x[0] = self.blue_portal.x
             self.snake.y[0] = self.blue_portal.y
-            #self.orange_portal.move()
-            #self.blue_portal.move()
+            self.orange_portal.move()
+            self.blue_portal.move()
             self.play_sound('portal.wav', 0.3)
         # Snake enters blue portal - warps to orange
         elif self.is_collision(self.snake.x[0], self.snake.y[0], self.blue_portal.x, self.blue_portal.y):
             self.snake.x[0] = self.orange_portal.x
             self.snake.y[0] = self.orange_portal.y
-            #self.orange_portal.move()
-            #self.blue_portal.move()
+            self.orange_portal.move()
+            self.blue_portal.move()
             self.play_sound('portal.wav', 0.3)
 
         # Snake collising with itself - game over
@@ -133,10 +140,9 @@ class Game:
 
     def show_game_over(self):
         self.render_background()
-        font = pygame.font.SysFont('comic sans MS', 30)
-        line1 = font.render(f'Game Over! Your final score is {self.snake.length*10}', True, TEXT_COLOR)
+        line1 = self.font.render(f'Game Over! Your final score is {self.snake.length*10}', True, TEXT_COLOR)
         self.surface.blit(line1, (350, 300))
-        line2 = font.render(f'Hit Enter to go again, or Esc to quit.', True, TEXT_COLOR)
+        line2 = self.font.render(f'Hit Enter to go again, or Esc to quit.', True, TEXT_COLOR)
         self.surface.blit(line2, (350, 350))
         pygame.display.flip()
 
@@ -147,6 +153,7 @@ class Game:
         self.orange_portal = Portal(self.surface, 'orange_portal.jpg')
         self.blue_portal = Portal(self.surface, 'blue_portal.jpg')
 
+    # Main loop
     def run(self):
         # Game loop
         running = True
@@ -269,8 +276,6 @@ class Apple:
         self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
         self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
 
-# TODO: Create decoy apple object that hurts the snake in some way
-
 # TODO: Add functionality to wait before moving portals
 class Portal:
     def __init__(self, parent_screen, image):
@@ -283,7 +288,7 @@ class Portal:
         self.parent_screen.blit(self.image, (self.x, self.y))
         pygame.display.flip()
 
-    def move(self): # Re randomise position
+    def move(self): # Re randomise position        
         self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
         self.y = random.randrange(BLOCKSIZE, Y_MAX, BLOCKSIZE)
 

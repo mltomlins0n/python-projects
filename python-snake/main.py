@@ -48,6 +48,12 @@ class Game:
     def render_background(self):
         bg = pygame.image.load('assets/background.jpg')
         self.surface.blit(bg, (0,0))
+    
+    def render_timer(self):
+        seconds = (pygame.time.get_ticks()-self.start_ticks) / 1000
+        txt = self.font.render(str(round(seconds, 1)), True, 'white')
+        self.surface.blit(txt, (20, 20))
+        self.clock.tick(60)
 
     def display_score(self):
         self.score_display = self.font.render(f'Score: {self.score}', True, TEXT_COLOR)
@@ -70,17 +76,13 @@ class Game:
 
     def play(self): # Runs every frame
         self.render_background()
+        self.render_timer()
         self.snake.move()
         self.apple.draw()
         self.bad_apple.draw()
         self.orange_portal.draw()
         self.blue_portal.draw()
         self.display_score()
-
-        seconds = (pygame.time.get_ticks()-self.start_ticks) / 1000
-        txt = self.font.render(str(round(seconds, 1)), True, 'white')
-        self.surface.blit(txt, (20, 20))
-        self.clock.tick(60)
         pygame.display.flip()
 
         # Snake eating apple and gains length

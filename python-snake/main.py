@@ -56,6 +56,10 @@ class Game:
         self.surface.blit(txt, (WINDOW_X*0.02, WINDOW_Y*0.02))
         self.clock.tick(60)
         return seconds
+
+    def display_fps(self):
+        fps = self.font.render(str(int(self.clock.get_fps())), True, 'white')
+        self.surface.blit(fps, (WINDOW_X*0.08, WINDOW_Y*0.02))
     
     def get_time(self):
         return self.render_timer()
@@ -82,6 +86,7 @@ class Game:
     def play(self): # Runs every frame
         self.render_background()
         self.render_timer()
+        #self.display_fps()
         self.snake.move()
         self.apple.draw()
         self.bad_apple.draw()
@@ -222,6 +227,7 @@ class Game:
                 pygame.mixer.music.stop()
                 paused = True
                 self.reset()
+                print(f'Error: {e}')
             time.sleep(0.1) # Game speed
 
 class Snake:

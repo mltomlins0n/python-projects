@@ -54,7 +54,7 @@ class Game:
         seconds = (pygame.time.get_ticks()-self.start_ticks) / 1000
         txt = self.font.render(str(round(seconds, 1)), True, 'white')
         self.surface.blit(txt, (WINDOW_X*0.02, WINDOW_Y*0.02))
-        self.clock.tick(60)
+        self.clock.tick()
         return seconds
 
     def display_fps(self):
@@ -94,7 +94,7 @@ class Game:
         self.blue_portal.draw()
         self.display_score()
         pygame.mouse.set_visible(0)
-        pygame.display.flip()
+        pygame.display.update()
 
         # Snake eating apple and gains length
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
@@ -180,7 +180,7 @@ class Game:
 
         continue_or_quit = self.font.render(f'Hit Enter to go again, or Esc to quit.', True, TEXT_COLOR)
         self.surface.blit(continue_or_quit, (WINDOW_X*0.35, WINDOW_Y*0.6))
-        pygame.display.flip()
+        pygame.display.update()
 
     def reset(self):
         self.start_ticks = pygame.time.get_ticks() # reset the clock
@@ -240,7 +240,8 @@ class Snake:
         # init an array of size 'length'
         self.x = [BLOCKSIZE] * length
         self.y = [BLOCKSIZE] * length
-        self.direction = 'down'
+        self.start_direction = ['up', 'down', 'left', 'right']
+        self.direction = random.choice(self.start_direction)
 
     def draw(self):
         for i in range(self.length):
@@ -250,12 +251,11 @@ class Snake:
                 self.parent_screen.blit(self.stripe, (self.x[i], self.y[i]))
             else:
                 self.parent_screen.blit(self.body, (self.x[i], self.y[i]))
-        pygame.display.flip()
 
     def draw_damage(self):
         for i in range(self.length):
             self.parent_screen.blit(self.head, (self.x[i], self.y[i]))
-        pygame.display.flip()
+        pygame.display.update()
     
     def increase_length(self):
         self.length += 1
@@ -309,7 +309,6 @@ class Apple:
 
     def draw(self):
         self.parent_screen.blit(self.image, (self.x, self.y))
-        pygame.display.flip()
     
     def move(self): # Re randomise position
         self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)
@@ -331,7 +330,6 @@ class Portal:
 
     def draw(self):
         self.parent_screen.blit(self.image, (self.x, self.y))
-        pygame.display.flip()
 
     def move(self): # Re randomise position        
         self.x = random.randrange(BLOCKSIZE, X_MAX, BLOCKSIZE)

@@ -20,10 +20,11 @@ class Game:
         pygame.mixer.init() # Initialize sounds
         self.clock = pygame.time.Clock()
         self.start_ticks = pygame.time.get_ticks()
-        self.font = pygame.font.SysFont('comic sans MS', 20)
         self.play_bgm('bgm.mp3', 0.1)
         # Draw the window
         self.surface = pygame.display.set_mode(size=(WINDOW_X, WINDOW_Y))
+        self.bg = pygame.image.load('assets/background.jpg')
+        self.font = pygame.font.SysFont('comic sans MS', 20)
         self.snake = Snake(self.surface, 3)
         self.snake.draw()
         self.apple = Apple(self.surface, 'apple.png')
@@ -46,8 +47,8 @@ class Game:
             return True
 
     def render_background(self):
-        bg = pygame.image.load('assets/background.jpg')
-        self.surface.blit(bg, (0,0))
+        self.surface.fill(BACKGROUND_COLOR)
+        self.surface.blit(self.bg, (0,0))
     
     def render_timer(self):
         seconds = (pygame.time.get_ticks()-self.start_ticks) / 1000
@@ -87,6 +88,7 @@ class Game:
         self.orange_portal.draw()
         self.blue_portal.draw()
         self.display_score()
+        pygame.mouse.set_visible(0)
         pygame.display.flip()
 
         # Snake eating apple and gains length
